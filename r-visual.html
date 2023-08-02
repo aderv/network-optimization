@@ -1,0 +1,3905 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Optimización de redes - 2&nbsp; Construcción y visualización de redes en con igraph</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./references.html" rel="next">
+<link href="./r-intro.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="styles/global.css">
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./r-visual.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Construcción y visualización de redes en con `igraph`</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Optimización de redes</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Presentación</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./r-intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introducción al uso de <code>R</code></span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./r-visual.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Construcción y visualización de redes en con <code>igraph</code></span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referencias</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#representación-de-una-red" id="toc-representación-de-una-red" class="nav-link active" data-scroll-target="#representación-de-una-red"><span class="header-section-number">2.1</span> Representación de una red</a></li>
+  <li><a href="#elementos-clave-al-graficar-una-red" id="toc-elementos-clave-al-graficar-una-red" class="nav-link" data-scroll-target="#elementos-clave-al-graficar-una-red"><span class="header-section-number">2.2</span> Elementos clave al graficar una red</a></li>
+  <li><a href="#bonus-colores" id="toc-bonus-colores" class="nav-link" data-scroll-target="#bonus-colores"><span class="header-section-number">2.3</span> <em>Bonus:</em> Colores</a></li>
+  <li><a href="#sistema-rgb-y-hexadecimal" id="toc-sistema-rgb-y-hexadecimal" class="nav-link" data-scroll-target="#sistema-rgb-y-hexadecimal"><span class="header-section-number">2.4</span> Sistema RGB y Hexadecimal</a>
+  <ul class="collapse">
+  <li><a href="#rgb" id="toc-rgb" class="nav-link" data-scroll-target="#rgb"><span class="header-section-number">2.4.1</span> RGB</a></li>
+  <li><a href="#hexadecimal" id="toc-hexadecimal" class="nav-link" data-scroll-target="#hexadecimal"><span class="header-section-number">2.4.2</span> Hexadecimal</a></li>
+  </ul></li>
+  <li><a href="#importar-los-datos" id="toc-importar-los-datos" class="nav-link" data-scroll-target="#importar-los-datos"><span class="header-section-number">2.5</span> Importar los datos</a></li>
+  <li><a href="#crear-la-red" id="toc-crear-la-red" class="nav-link" data-scroll-target="#crear-la-red"><span class="header-section-number">2.6</span> Crear la red</a></li>
+  <li><a href="#graficar-la-red" id="toc-graficar-la-red" class="nav-link" data-scroll-target="#graficar-la-red"><span class="header-section-number">2.7</span> Graficar la red</a></li>
+  <li><a href="#parámetros-del-gráfico" id="toc-parámetros-del-gráfico" class="nav-link" data-scroll-target="#parámetros-del-gráfico"><span class="header-section-number">2.8</span> Parámetros del gráfico</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Construcción y visualización de redes en con <code>igraph</code></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<p>Basado en el tutorial de <a href="https://kateto.net/network-visualization" class="uri">https://kateto.net/network-visualization</a></p>
+<hr>
+<section id="representación-de-una-red" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="representación-de-una-red"><span class="header-section-number">2.1</span> Representación de una red</h2>
+<ul>
+<li><p>Hay varias formas de representar una red. La más común es la de <em>mapa de red</em> que hemos estado haciendo desde el principio, donde los nodos se representan con círculos o puntos y las aristas con líneas entre los nodos, si es una red dirigida, la línea se convierte en una flecha.</p></li>
+<li><p>El tipo de representación a usar, dependerá del objetivo que tengamos en mente. En cualquier caso, lo que se busca es hacer el problema más <em>legible</em>. Y este es uno de los grandes atractivos de los problemas de redes.</p></li>
+<li><p>Debemos cuidar algunos aspectos básicos para obtener una buena representación.</p></li>
+<li><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/ntw-goals.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Tomado de: <a href="https://kateto.net/network-visualization" class="uri">https://kateto.net/network-visualization</a></figcaption>
+</figure>
+</div></li>
+</ul>
+</section>
+<section id="elementos-clave-al-graficar-una-red" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="elementos-clave-al-graficar-una-red"><span class="header-section-number">2.2</span> Elementos clave al graficar una red</h2>
+<ul>
+<li><p>Entre los conceptos o elementos claves que debemos tener en cuenta a la hora de graficar nuestra red están:</p>
+<ul>
+<li>Posición de los nodos</li>
+<li>Colores</li>
+<li>Forma de nodos y arcos</li>
+<li>Diseño en general</li>
+</ul></li>
+<li><p>El <em>layout</em> de la red busca maximizar la estética y legibilidad de lo que queremos comunicar. Algunas cosas a tener en cuenta</p></li>
+<li><div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/ntw-aes.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Tomado de: <a href="https://kateto.net/network-visualization" class="uri">https://kateto.net/network-visualization</a></figcaption>
+</figure>
+</div></li>
+</ul>
+</section>
+<section id="bonus-colores" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="bonus-colores"><span class="header-section-number">2.3</span> <em>Bonus:</em> Colores</h2>
+<ul>
+<li><p>Parte importante de nuestra red como gráfica, es el uso de los colores</p></li>
+<li><p>En <code>R</code> podemos manejar colores por nombres (en inglés, por supuesto) o usando sistemas de codificación como el RGB y Hexadecimal</p></li>
+<li><p>Una lista de colores en <code>R</code> la podemos obtener con <code>colors()</code></p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-1_4445d1134bfc3d103aae41d8dfb2aa6c">
+<div class="cell-output-display">
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; overflow-x: scroll; width:300px; ">
+<table class="table table-condensed table-striped table-sm small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">N</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">Colores</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">white</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">aliceblue</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">antiquewhite</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">antiquewhite1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">antiquewhite2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">6</td>
+<td style="text-align: left;">antiquewhite3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">7</td>
+<td style="text-align: left;">antiquewhite4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">8</td>
+<td style="text-align: left;">aquamarine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">9</td>
+<td style="text-align: left;">aquamarine1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">aquamarine2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">11</td>
+<td style="text-align: left;">aquamarine3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">12</td>
+<td style="text-align: left;">aquamarine4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">13</td>
+<td style="text-align: left;">azure</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">14</td>
+<td style="text-align: left;">azure1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">15</td>
+<td style="text-align: left;">azure2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">16</td>
+<td style="text-align: left;">azure3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">17</td>
+<td style="text-align: left;">azure4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">18</td>
+<td style="text-align: left;">beige</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">19</td>
+<td style="text-align: left;">bisque</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">20</td>
+<td style="text-align: left;">bisque1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">21</td>
+<td style="text-align: left;">bisque2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">22</td>
+<td style="text-align: left;">bisque3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">23</td>
+<td style="text-align: left;">bisque4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">24</td>
+<td style="text-align: left;">black</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">25</td>
+<td style="text-align: left;">blanchedalmond</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">26</td>
+<td style="text-align: left;">blue</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">27</td>
+<td style="text-align: left;">blue1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">28</td>
+<td style="text-align: left;">blue2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">29</td>
+<td style="text-align: left;">blue3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">30</td>
+<td style="text-align: left;">blue4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">31</td>
+<td style="text-align: left;">blueviolet</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">32</td>
+<td style="text-align: left;">brown</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">33</td>
+<td style="text-align: left;">brown1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">34</td>
+<td style="text-align: left;">brown2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">35</td>
+<td style="text-align: left;">brown3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">36</td>
+<td style="text-align: left;">brown4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">37</td>
+<td style="text-align: left;">burlywood</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">38</td>
+<td style="text-align: left;">burlywood1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">39</td>
+<td style="text-align: left;">burlywood2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">40</td>
+<td style="text-align: left;">burlywood3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">41</td>
+<td style="text-align: left;">burlywood4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">42</td>
+<td style="text-align: left;">cadetblue</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">43</td>
+<td style="text-align: left;">cadetblue1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">44</td>
+<td style="text-align: left;">cadetblue2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">45</td>
+<td style="text-align: left;">cadetblue3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">46</td>
+<td style="text-align: left;">cadetblue4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">47</td>
+<td style="text-align: left;">chartreuse</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">48</td>
+<td style="text-align: left;">chartreuse1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">49</td>
+<td style="text-align: left;">chartreuse2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">50</td>
+<td style="text-align: left;">chartreuse3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">51</td>
+<td style="text-align: left;">chartreuse4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">52</td>
+<td style="text-align: left;">chocolate</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">53</td>
+<td style="text-align: left;">chocolate1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">54</td>
+<td style="text-align: left;">chocolate2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">55</td>
+<td style="text-align: left;">chocolate3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">56</td>
+<td style="text-align: left;">chocolate4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">57</td>
+<td style="text-align: left;">coral</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">58</td>
+<td style="text-align: left;">coral1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">59</td>
+<td style="text-align: left;">coral2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">60</td>
+<td style="text-align: left;">coral3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">61</td>
+<td style="text-align: left;">coral4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">62</td>
+<td style="text-align: left;">cornflowerblue</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">63</td>
+<td style="text-align: left;">cornsilk</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">64</td>
+<td style="text-align: left;">cornsilk1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">65</td>
+<td style="text-align: left;">cornsilk2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">66</td>
+<td style="text-align: left;">cornsilk3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">67</td>
+<td style="text-align: left;">cornsilk4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">68</td>
+<td style="text-align: left;">cyan</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">69</td>
+<td style="text-align: left;">cyan1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">70</td>
+<td style="text-align: left;">cyan2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">71</td>
+<td style="text-align: left;">cyan3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">72</td>
+<td style="text-align: left;">cyan4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">73</td>
+<td style="text-align: left;">darkblue</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">74</td>
+<td style="text-align: left;">darkcyan</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">75</td>
+<td style="text-align: left;">darkgoldenrod</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">76</td>
+<td style="text-align: left;">darkgoldenrod1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">77</td>
+<td style="text-align: left;">darkgoldenrod2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">78</td>
+<td style="text-align: left;">darkgoldenrod3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">79</td>
+<td style="text-align: left;">darkgoldenrod4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">80</td>
+<td style="text-align: left;">darkgray</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">81</td>
+<td style="text-align: left;">darkgreen</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">82</td>
+<td style="text-align: left;">darkgrey</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">83</td>
+<td style="text-align: left;">darkkhaki</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">84</td>
+<td style="text-align: left;">darkmagenta</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">85</td>
+<td style="text-align: left;">darkolivegreen</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">86</td>
+<td style="text-align: left;">darkolivegreen1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">87</td>
+<td style="text-align: left;">darkolivegreen2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">88</td>
+<td style="text-align: left;">darkolivegreen3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">89</td>
+<td style="text-align: left;">darkolivegreen4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">90</td>
+<td style="text-align: left;">darkorange</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">91</td>
+<td style="text-align: left;">darkorange1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">92</td>
+<td style="text-align: left;">darkorange2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">93</td>
+<td style="text-align: left;">darkorange3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">94</td>
+<td style="text-align: left;">darkorange4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">95</td>
+<td style="text-align: left;">darkorchid</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">96</td>
+<td style="text-align: left;">darkorchid1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">97</td>
+<td style="text-align: left;">darkorchid2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">98</td>
+<td style="text-align: left;">darkorchid3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">99</td>
+<td style="text-align: left;">darkorchid4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">100</td>
+<td style="text-align: left;">darkred</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">101</td>
+<td style="text-align: left;">darksalmon</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">102</td>
+<td style="text-align: left;">darkseagreen</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">103</td>
+<td style="text-align: left;">darkseagreen1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">104</td>
+<td style="text-align: left;">darkseagreen2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">105</td>
+<td style="text-align: left;">darkseagreen3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">106</td>
+<td style="text-align: left;">darkseagreen4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">107</td>
+<td style="text-align: left;">darkslateblue</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">108</td>
+<td style="text-align: left;">darkslategray</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">109</td>
+<td style="text-align: left;">darkslategray1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">110</td>
+<td style="text-align: left;">darkslategray2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">111</td>
+<td style="text-align: left;">darkslategray3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">112</td>
+<td style="text-align: left;">darkslategray4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">113</td>
+<td style="text-align: left;">darkslategrey</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">114</td>
+<td style="text-align: left;">darkturquoise</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">115</td>
+<td style="text-align: left;">darkviolet</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">116</td>
+<td style="text-align: left;">deeppink</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">117</td>
+<td style="text-align: left;">deeppink1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">118</td>
+<td style="text-align: left;">deeppink2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">119</td>
+<td style="text-align: left;">deeppink3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">120</td>
+<td style="text-align: left;">deeppink4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">121</td>
+<td style="text-align: left;">deepskyblue</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">122</td>
+<td style="text-align: left;">deepskyblue1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">123</td>
+<td style="text-align: left;">deepskyblue2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">124</td>
+<td style="text-align: left;">deepskyblue3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">125</td>
+<td style="text-align: left;">deepskyblue4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">126</td>
+<td style="text-align: left;">dimgray</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">127</td>
+<td style="text-align: left;">dimgrey</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">128</td>
+<td style="text-align: left;">dodgerblue</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">129</td>
+<td style="text-align: left;">dodgerblue1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">130</td>
+<td style="text-align: left;">dodgerblue2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">131</td>
+<td style="text-align: left;">dodgerblue3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">132</td>
+<td style="text-align: left;">dodgerblue4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">133</td>
+<td style="text-align: left;">firebrick</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">134</td>
+<td style="text-align: left;">firebrick1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">135</td>
+<td style="text-align: left;">firebrick2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">136</td>
+<td style="text-align: left;">firebrick3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">137</td>
+<td style="text-align: left;">firebrick4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">138</td>
+<td style="text-align: left;">floralwhite</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">139</td>
+<td style="text-align: left;">forestgreen</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">140</td>
+<td style="text-align: left;">gainsboro</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">141</td>
+<td style="text-align: left;">ghostwhite</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">142</td>
+<td style="text-align: left;">gold</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">143</td>
+<td style="text-align: left;">gold1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">144</td>
+<td style="text-align: left;">gold2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">145</td>
+<td style="text-align: left;">gold3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">146</td>
+<td style="text-align: left;">gold4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">147</td>
+<td style="text-align: left;">goldenrod</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">148</td>
+<td style="text-align: left;">goldenrod1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">149</td>
+<td style="text-align: left;">goldenrod2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">150</td>
+<td style="text-align: left;">goldenrod3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">151</td>
+<td style="text-align: left;">goldenrod4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">152</td>
+<td style="text-align: left;">gray</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">153</td>
+<td style="text-align: left;">gray0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">154</td>
+<td style="text-align: left;">gray1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">155</td>
+<td style="text-align: left;">gray2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">156</td>
+<td style="text-align: left;">gray3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">157</td>
+<td style="text-align: left;">gray4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">158</td>
+<td style="text-align: left;">gray5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">159</td>
+<td style="text-align: left;">gray6</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">160</td>
+<td style="text-align: left;">gray7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">161</td>
+<td style="text-align: left;">gray8</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">162</td>
+<td style="text-align: left;">gray9</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">163</td>
+<td style="text-align: left;">gray10</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">164</td>
+<td style="text-align: left;">gray11</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">165</td>
+<td style="text-align: left;">gray12</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">166</td>
+<td style="text-align: left;">gray13</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">167</td>
+<td style="text-align: left;">gray14</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">168</td>
+<td style="text-align: left;">gray15</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">169</td>
+<td style="text-align: left;">gray16</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">170</td>
+<td style="text-align: left;">gray17</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">171</td>
+<td style="text-align: left;">gray18</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">172</td>
+<td style="text-align: left;">gray19</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">173</td>
+<td style="text-align: left;">gray20</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">174</td>
+<td style="text-align: left;">gray21</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">175</td>
+<td style="text-align: left;">gray22</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">176</td>
+<td style="text-align: left;">gray23</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">177</td>
+<td style="text-align: left;">gray24</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">178</td>
+<td style="text-align: left;">gray25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">179</td>
+<td style="text-align: left;">gray26</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">180</td>
+<td style="text-align: left;">gray27</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">181</td>
+<td style="text-align: left;">gray28</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">182</td>
+<td style="text-align: left;">gray29</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">183</td>
+<td style="text-align: left;">gray30</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">184</td>
+<td style="text-align: left;">gray31</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">185</td>
+<td style="text-align: left;">gray32</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">186</td>
+<td style="text-align: left;">gray33</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">187</td>
+<td style="text-align: left;">gray34</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">188</td>
+<td style="text-align: left;">gray35</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">189</td>
+<td style="text-align: left;">gray36</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">190</td>
+<td style="text-align: left;">gray37</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">191</td>
+<td style="text-align: left;">gray38</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">192</td>
+<td style="text-align: left;">gray39</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">193</td>
+<td style="text-align: left;">gray40</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">194</td>
+<td style="text-align: left;">gray41</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">195</td>
+<td style="text-align: left;">gray42</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">196</td>
+<td style="text-align: left;">gray43</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">197</td>
+<td style="text-align: left;">gray44</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">198</td>
+<td style="text-align: left;">gray45</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">199</td>
+<td style="text-align: left;">gray46</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">200</td>
+<td style="text-align: left;">gray47</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">201</td>
+<td style="text-align: left;">gray48</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">202</td>
+<td style="text-align: left;">gray49</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">203</td>
+<td style="text-align: left;">gray50</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">204</td>
+<td style="text-align: left;">gray51</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">205</td>
+<td style="text-align: left;">gray52</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">206</td>
+<td style="text-align: left;">gray53</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">207</td>
+<td style="text-align: left;">gray54</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">208</td>
+<td style="text-align: left;">gray55</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">209</td>
+<td style="text-align: left;">gray56</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">210</td>
+<td style="text-align: left;">gray57</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">211</td>
+<td style="text-align: left;">gray58</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">212</td>
+<td style="text-align: left;">gray59</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">213</td>
+<td style="text-align: left;">gray60</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">214</td>
+<td style="text-align: left;">gray61</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">215</td>
+<td style="text-align: left;">gray62</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">216</td>
+<td style="text-align: left;">gray63</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">217</td>
+<td style="text-align: left;">gray64</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">218</td>
+<td style="text-align: left;">gray65</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">219</td>
+<td style="text-align: left;">gray66</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">220</td>
+<td style="text-align: left;">gray67</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">221</td>
+<td style="text-align: left;">gray68</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">222</td>
+<td style="text-align: left;">gray69</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">223</td>
+<td style="text-align: left;">gray70</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">224</td>
+<td style="text-align: left;">gray71</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">225</td>
+<td style="text-align: left;">gray72</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">226</td>
+<td style="text-align: left;">gray73</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">227</td>
+<td style="text-align: left;">gray74</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">228</td>
+<td style="text-align: left;">gray75</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">229</td>
+<td style="text-align: left;">gray76</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">230</td>
+<td style="text-align: left;">gray77</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">231</td>
+<td style="text-align: left;">gray78</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">232</td>
+<td style="text-align: left;">gray79</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">233</td>
+<td style="text-align: left;">gray80</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">234</td>
+<td style="text-align: left;">gray81</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">235</td>
+<td style="text-align: left;">gray82</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">236</td>
+<td style="text-align: left;">gray83</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">237</td>
+<td style="text-align: left;">gray84</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">238</td>
+<td style="text-align: left;">gray85</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">239</td>
+<td style="text-align: left;">gray86</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">240</td>
+<td style="text-align: left;">gray87</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">241</td>
+<td style="text-align: left;">gray88</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">242</td>
+<td style="text-align: left;">gray89</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">243</td>
+<td style="text-align: left;">gray90</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">244</td>
+<td style="text-align: left;">gray91</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">245</td>
+<td style="text-align: left;">gray92</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">246</td>
+<td style="text-align: left;">gray93</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">247</td>
+<td style="text-align: left;">gray94</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">248</td>
+<td style="text-align: left;">gray95</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">249</td>
+<td style="text-align: left;">gray96</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">250</td>
+<td style="text-align: left;">gray97</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">251</td>
+<td style="text-align: left;">gray98</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">252</td>
+<td style="text-align: left;">gray99</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">253</td>
+<td style="text-align: left;">gray100</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">254</td>
+<td style="text-align: left;">green</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">255</td>
+<td style="text-align: left;">green1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">256</td>
+<td style="text-align: left;">green2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">257</td>
+<td style="text-align: left;">green3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">258</td>
+<td style="text-align: left;">green4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">259</td>
+<td style="text-align: left;">greenyellow</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">260</td>
+<td style="text-align: left;">grey</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">261</td>
+<td style="text-align: left;">grey0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">262</td>
+<td style="text-align: left;">grey1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">263</td>
+<td style="text-align: left;">grey2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">264</td>
+<td style="text-align: left;">grey3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">265</td>
+<td style="text-align: left;">grey4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">266</td>
+<td style="text-align: left;">grey5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">267</td>
+<td style="text-align: left;">grey6</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">268</td>
+<td style="text-align: left;">grey7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">269</td>
+<td style="text-align: left;">grey8</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">270</td>
+<td style="text-align: left;">grey9</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">271</td>
+<td style="text-align: left;">grey10</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">272</td>
+<td style="text-align: left;">grey11</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">273</td>
+<td style="text-align: left;">grey12</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">274</td>
+<td style="text-align: left;">grey13</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">275</td>
+<td style="text-align: left;">grey14</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">276</td>
+<td style="text-align: left;">grey15</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">277</td>
+<td style="text-align: left;">grey16</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">278</td>
+<td style="text-align: left;">grey17</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">279</td>
+<td style="text-align: left;">grey18</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">280</td>
+<td style="text-align: left;">grey19</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">281</td>
+<td style="text-align: left;">grey20</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">282</td>
+<td style="text-align: left;">grey21</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">283</td>
+<td style="text-align: left;">grey22</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">284</td>
+<td style="text-align: left;">grey23</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">285</td>
+<td style="text-align: left;">grey24</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">286</td>
+<td style="text-align: left;">grey25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">287</td>
+<td style="text-align: left;">grey26</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">288</td>
+<td style="text-align: left;">grey27</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">289</td>
+<td style="text-align: left;">grey28</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">290</td>
+<td style="text-align: left;">grey29</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">291</td>
+<td style="text-align: left;">grey30</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">292</td>
+<td style="text-align: left;">grey31</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">293</td>
+<td style="text-align: left;">grey32</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">294</td>
+<td style="text-align: left;">grey33</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">295</td>
+<td style="text-align: left;">grey34</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">296</td>
+<td style="text-align: left;">grey35</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">297</td>
+<td style="text-align: left;">grey36</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">298</td>
+<td style="text-align: left;">grey37</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">299</td>
+<td style="text-align: left;">grey38</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">300</td>
+<td style="text-align: left;">grey39</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">301</td>
+<td style="text-align: left;">grey40</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">302</td>
+<td style="text-align: left;">grey41</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">303</td>
+<td style="text-align: left;">grey42</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">304</td>
+<td style="text-align: left;">grey43</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">305</td>
+<td style="text-align: left;">grey44</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">306</td>
+<td style="text-align: left;">grey45</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">307</td>
+<td style="text-align: left;">grey46</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">308</td>
+<td style="text-align: left;">grey47</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">309</td>
+<td style="text-align: left;">grey48</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">310</td>
+<td style="text-align: left;">grey49</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">311</td>
+<td style="text-align: left;">grey50</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">312</td>
+<td style="text-align: left;">grey51</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">313</td>
+<td style="text-align: left;">grey52</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">314</td>
+<td style="text-align: left;">grey53</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">315</td>
+<td style="text-align: left;">grey54</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">316</td>
+<td style="text-align: left;">grey55</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">317</td>
+<td style="text-align: left;">grey56</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">318</td>
+<td style="text-align: left;">grey57</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">319</td>
+<td style="text-align: left;">grey58</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">320</td>
+<td style="text-align: left;">grey59</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">321</td>
+<td style="text-align: left;">grey60</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">322</td>
+<td style="text-align: left;">grey61</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">323</td>
+<td style="text-align: left;">grey62</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">324</td>
+<td style="text-align: left;">grey63</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">325</td>
+<td style="text-align: left;">grey64</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">326</td>
+<td style="text-align: left;">grey65</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">327</td>
+<td style="text-align: left;">grey66</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">328</td>
+<td style="text-align: left;">grey67</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">329</td>
+<td style="text-align: left;">grey68</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">330</td>
+<td style="text-align: left;">grey69</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">331</td>
+<td style="text-align: left;">grey70</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">332</td>
+<td style="text-align: left;">grey71</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">333</td>
+<td style="text-align: left;">grey72</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">334</td>
+<td style="text-align: left;">grey73</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">335</td>
+<td style="text-align: left;">grey74</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">336</td>
+<td style="text-align: left;">grey75</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">337</td>
+<td style="text-align: left;">grey76</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">338</td>
+<td style="text-align: left;">grey77</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">339</td>
+<td style="text-align: left;">grey78</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">340</td>
+<td style="text-align: left;">grey79</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">341</td>
+<td style="text-align: left;">grey80</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">342</td>
+<td style="text-align: left;">grey81</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">343</td>
+<td style="text-align: left;">grey82</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">344</td>
+<td style="text-align: left;">grey83</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">345</td>
+<td style="text-align: left;">grey84</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">346</td>
+<td style="text-align: left;">grey85</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">347</td>
+<td style="text-align: left;">grey86</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">348</td>
+<td style="text-align: left;">grey87</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">349</td>
+<td style="text-align: left;">grey88</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">350</td>
+<td style="text-align: left;">grey89</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">351</td>
+<td style="text-align: left;">grey90</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">352</td>
+<td style="text-align: left;">grey91</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">353</td>
+<td style="text-align: left;">grey92</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">354</td>
+<td style="text-align: left;">grey93</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">355</td>
+<td style="text-align: left;">grey94</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">356</td>
+<td style="text-align: left;">grey95</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">357</td>
+<td style="text-align: left;">grey96</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">358</td>
+<td style="text-align: left;">grey97</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">359</td>
+<td style="text-align: left;">grey98</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">360</td>
+<td style="text-align: left;">grey99</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">361</td>
+<td style="text-align: left;">grey100</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">362</td>
+<td style="text-align: left;">honeydew</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">363</td>
+<td style="text-align: left;">honeydew1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">364</td>
+<td style="text-align: left;">honeydew2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">365</td>
+<td style="text-align: left;">honeydew3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">366</td>
+<td style="text-align: left;">honeydew4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">367</td>
+<td style="text-align: left;">hotpink</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">368</td>
+<td style="text-align: left;">hotpink1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">369</td>
+<td style="text-align: left;">hotpink2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">370</td>
+<td style="text-align: left;">hotpink3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">371</td>
+<td style="text-align: left;">hotpink4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">372</td>
+<td style="text-align: left;">indianred</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">373</td>
+<td style="text-align: left;">indianred1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">374</td>
+<td style="text-align: left;">indianred2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">375</td>
+<td style="text-align: left;">indianred3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">376</td>
+<td style="text-align: left;">indianred4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">377</td>
+<td style="text-align: left;">ivory</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">378</td>
+<td style="text-align: left;">ivory1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">379</td>
+<td style="text-align: left;">ivory2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">380</td>
+<td style="text-align: left;">ivory3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">381</td>
+<td style="text-align: left;">ivory4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">382</td>
+<td style="text-align: left;">khaki</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">383</td>
+<td style="text-align: left;">khaki1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">384</td>
+<td style="text-align: left;">khaki2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">385</td>
+<td style="text-align: left;">khaki3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">386</td>
+<td style="text-align: left;">khaki4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">387</td>
+<td style="text-align: left;">lavender</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">388</td>
+<td style="text-align: left;">lavenderblush</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">389</td>
+<td style="text-align: left;">lavenderblush1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">390</td>
+<td style="text-align: left;">lavenderblush2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">391</td>
+<td style="text-align: left;">lavenderblush3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">392</td>
+<td style="text-align: left;">lavenderblush4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">393</td>
+<td style="text-align: left;">lawngreen</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">394</td>
+<td style="text-align: left;">lemonchiffon</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">395</td>
+<td style="text-align: left;">lemonchiffon1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">396</td>
+<td style="text-align: left;">lemonchiffon2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">397</td>
+<td style="text-align: left;">lemonchiffon3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">398</td>
+<td style="text-align: left;">lemonchiffon4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">399</td>
+<td style="text-align: left;">lightblue</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">400</td>
+<td style="text-align: left;">lightblue1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">401</td>
+<td style="text-align: left;">lightblue2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">402</td>
+<td style="text-align: left;">lightblue3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">403</td>
+<td style="text-align: left;">lightblue4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">404</td>
+<td style="text-align: left;">lightcoral</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">405</td>
+<td style="text-align: left;">lightcyan</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">406</td>
+<td style="text-align: left;">lightcyan1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">407</td>
+<td style="text-align: left;">lightcyan2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">408</td>
+<td style="text-align: left;">lightcyan3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">409</td>
+<td style="text-align: left;">lightcyan4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">410</td>
+<td style="text-align: left;">lightgoldenrod</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">411</td>
+<td style="text-align: left;">lightgoldenrod1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">412</td>
+<td style="text-align: left;">lightgoldenrod2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">413</td>
+<td style="text-align: left;">lightgoldenrod3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">414</td>
+<td style="text-align: left;">lightgoldenrod4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">415</td>
+<td style="text-align: left;">lightgoldenrodyellow</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">416</td>
+<td style="text-align: left;">lightgray</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">417</td>
+<td style="text-align: left;">lightgreen</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">418</td>
+<td style="text-align: left;">lightgrey</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">419</td>
+<td style="text-align: left;">lightpink</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">420</td>
+<td style="text-align: left;">lightpink1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">421</td>
+<td style="text-align: left;">lightpink2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">422</td>
+<td style="text-align: left;">lightpink3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">423</td>
+<td style="text-align: left;">lightpink4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">424</td>
+<td style="text-align: left;">lightsalmon</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">425</td>
+<td style="text-align: left;">lightsalmon1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">426</td>
+<td style="text-align: left;">lightsalmon2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">427</td>
+<td style="text-align: left;">lightsalmon3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">428</td>
+<td style="text-align: left;">lightsalmon4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">429</td>
+<td style="text-align: left;">lightseagreen</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">430</td>
+<td style="text-align: left;">lightskyblue</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">431</td>
+<td style="text-align: left;">lightskyblue1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">432</td>
+<td style="text-align: left;">lightskyblue2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">433</td>
+<td style="text-align: left;">lightskyblue3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">434</td>
+<td style="text-align: left;">lightskyblue4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">435</td>
+<td style="text-align: left;">lightslateblue</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">436</td>
+<td style="text-align: left;">lightslategray</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">437</td>
+<td style="text-align: left;">lightslategrey</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">438</td>
+<td style="text-align: left;">lightsteelblue</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">439</td>
+<td style="text-align: left;">lightsteelblue1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">440</td>
+<td style="text-align: left;">lightsteelblue2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">441</td>
+<td style="text-align: left;">lightsteelblue3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">442</td>
+<td style="text-align: left;">lightsteelblue4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">443</td>
+<td style="text-align: left;">lightyellow</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">444</td>
+<td style="text-align: left;">lightyellow1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">445</td>
+<td style="text-align: left;">lightyellow2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">446</td>
+<td style="text-align: left;">lightyellow3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">447</td>
+<td style="text-align: left;">lightyellow4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">448</td>
+<td style="text-align: left;">limegreen</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">449</td>
+<td style="text-align: left;">linen</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">450</td>
+<td style="text-align: left;">magenta</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">451</td>
+<td style="text-align: left;">magenta1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">452</td>
+<td style="text-align: left;">magenta2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">453</td>
+<td style="text-align: left;">magenta3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">454</td>
+<td style="text-align: left;">magenta4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">455</td>
+<td style="text-align: left;">maroon</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">456</td>
+<td style="text-align: left;">maroon1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">457</td>
+<td style="text-align: left;">maroon2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">458</td>
+<td style="text-align: left;">maroon3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">459</td>
+<td style="text-align: left;">maroon4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">460</td>
+<td style="text-align: left;">mediumaquamarine</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">461</td>
+<td style="text-align: left;">mediumblue</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">462</td>
+<td style="text-align: left;">mediumorchid</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">463</td>
+<td style="text-align: left;">mediumorchid1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">464</td>
+<td style="text-align: left;">mediumorchid2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">465</td>
+<td style="text-align: left;">mediumorchid3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">466</td>
+<td style="text-align: left;">mediumorchid4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">467</td>
+<td style="text-align: left;">mediumpurple</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">468</td>
+<td style="text-align: left;">mediumpurple1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">469</td>
+<td style="text-align: left;">mediumpurple2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">470</td>
+<td style="text-align: left;">mediumpurple3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">471</td>
+<td style="text-align: left;">mediumpurple4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">472</td>
+<td style="text-align: left;">mediumseagreen</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">473</td>
+<td style="text-align: left;">mediumslateblue</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">474</td>
+<td style="text-align: left;">mediumspringgreen</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">475</td>
+<td style="text-align: left;">mediumturquoise</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">476</td>
+<td style="text-align: left;">mediumvioletred</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">477</td>
+<td style="text-align: left;">midnightblue</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">478</td>
+<td style="text-align: left;">mintcream</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">479</td>
+<td style="text-align: left;">mistyrose</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">480</td>
+<td style="text-align: left;">mistyrose1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">481</td>
+<td style="text-align: left;">mistyrose2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">482</td>
+<td style="text-align: left;">mistyrose3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">483</td>
+<td style="text-align: left;">mistyrose4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">484</td>
+<td style="text-align: left;">moccasin</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">485</td>
+<td style="text-align: left;">navajowhite</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">486</td>
+<td style="text-align: left;">navajowhite1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">487</td>
+<td style="text-align: left;">navajowhite2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">488</td>
+<td style="text-align: left;">navajowhite3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">489</td>
+<td style="text-align: left;">navajowhite4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">490</td>
+<td style="text-align: left;">navy</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">491</td>
+<td style="text-align: left;">navyblue</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">492</td>
+<td style="text-align: left;">oldlace</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">493</td>
+<td style="text-align: left;">olivedrab</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">494</td>
+<td style="text-align: left;">olivedrab1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">495</td>
+<td style="text-align: left;">olivedrab2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">496</td>
+<td style="text-align: left;">olivedrab3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">497</td>
+<td style="text-align: left;">olivedrab4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">498</td>
+<td style="text-align: left;">orange</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">499</td>
+<td style="text-align: left;">orange1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">500</td>
+<td style="text-align: left;">orange2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">501</td>
+<td style="text-align: left;">orange3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">502</td>
+<td style="text-align: left;">orange4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">503</td>
+<td style="text-align: left;">orangered</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">504</td>
+<td style="text-align: left;">orangered1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">505</td>
+<td style="text-align: left;">orangered2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">506</td>
+<td style="text-align: left;">orangered3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">507</td>
+<td style="text-align: left;">orangered4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">508</td>
+<td style="text-align: left;">orchid</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">509</td>
+<td style="text-align: left;">orchid1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">510</td>
+<td style="text-align: left;">orchid2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">511</td>
+<td style="text-align: left;">orchid3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">512</td>
+<td style="text-align: left;">orchid4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">513</td>
+<td style="text-align: left;">palegoldenrod</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">514</td>
+<td style="text-align: left;">palegreen</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">515</td>
+<td style="text-align: left;">palegreen1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">516</td>
+<td style="text-align: left;">palegreen2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">517</td>
+<td style="text-align: left;">palegreen3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">518</td>
+<td style="text-align: left;">palegreen4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">519</td>
+<td style="text-align: left;">paleturquoise</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">520</td>
+<td style="text-align: left;">paleturquoise1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">521</td>
+<td style="text-align: left;">paleturquoise2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">522</td>
+<td style="text-align: left;">paleturquoise3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">523</td>
+<td style="text-align: left;">paleturquoise4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">524</td>
+<td style="text-align: left;">palevioletred</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">525</td>
+<td style="text-align: left;">palevioletred1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">526</td>
+<td style="text-align: left;">palevioletred2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">527</td>
+<td style="text-align: left;">palevioletred3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">528</td>
+<td style="text-align: left;">palevioletred4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">529</td>
+<td style="text-align: left;">papayawhip</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">530</td>
+<td style="text-align: left;">peachpuff</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">531</td>
+<td style="text-align: left;">peachpuff1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">532</td>
+<td style="text-align: left;">peachpuff2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">533</td>
+<td style="text-align: left;">peachpuff3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">534</td>
+<td style="text-align: left;">peachpuff4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">535</td>
+<td style="text-align: left;">peru</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">536</td>
+<td style="text-align: left;">pink</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">537</td>
+<td style="text-align: left;">pink1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">538</td>
+<td style="text-align: left;">pink2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">539</td>
+<td style="text-align: left;">pink3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">540</td>
+<td style="text-align: left;">pink4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">541</td>
+<td style="text-align: left;">plum</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">542</td>
+<td style="text-align: left;">plum1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">543</td>
+<td style="text-align: left;">plum2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">544</td>
+<td style="text-align: left;">plum3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">545</td>
+<td style="text-align: left;">plum4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">546</td>
+<td style="text-align: left;">powderblue</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">547</td>
+<td style="text-align: left;">purple</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">548</td>
+<td style="text-align: left;">purple1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">549</td>
+<td style="text-align: left;">purple2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">550</td>
+<td style="text-align: left;">purple3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">551</td>
+<td style="text-align: left;">purple4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">552</td>
+<td style="text-align: left;">red</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">553</td>
+<td style="text-align: left;">red1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">554</td>
+<td style="text-align: left;">red2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">555</td>
+<td style="text-align: left;">red3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">556</td>
+<td style="text-align: left;">red4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">557</td>
+<td style="text-align: left;">rosybrown</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">558</td>
+<td style="text-align: left;">rosybrown1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">559</td>
+<td style="text-align: left;">rosybrown2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">560</td>
+<td style="text-align: left;">rosybrown3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">561</td>
+<td style="text-align: left;">rosybrown4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">562</td>
+<td style="text-align: left;">royalblue</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">563</td>
+<td style="text-align: left;">royalblue1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">564</td>
+<td style="text-align: left;">royalblue2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">565</td>
+<td style="text-align: left;">royalblue3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">566</td>
+<td style="text-align: left;">royalblue4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">567</td>
+<td style="text-align: left;">saddlebrown</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">568</td>
+<td style="text-align: left;">salmon</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">569</td>
+<td style="text-align: left;">salmon1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">570</td>
+<td style="text-align: left;">salmon2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">571</td>
+<td style="text-align: left;">salmon3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">572</td>
+<td style="text-align: left;">salmon4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">573</td>
+<td style="text-align: left;">sandybrown</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">574</td>
+<td style="text-align: left;">seagreen</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">575</td>
+<td style="text-align: left;">seagreen1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">576</td>
+<td style="text-align: left;">seagreen2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">577</td>
+<td style="text-align: left;">seagreen3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">578</td>
+<td style="text-align: left;">seagreen4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">579</td>
+<td style="text-align: left;">seashell</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">580</td>
+<td style="text-align: left;">seashell1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">581</td>
+<td style="text-align: left;">seashell2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">582</td>
+<td style="text-align: left;">seashell3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">583</td>
+<td style="text-align: left;">seashell4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">584</td>
+<td style="text-align: left;">sienna</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">585</td>
+<td style="text-align: left;">sienna1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">586</td>
+<td style="text-align: left;">sienna2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">587</td>
+<td style="text-align: left;">sienna3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">588</td>
+<td style="text-align: left;">sienna4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">589</td>
+<td style="text-align: left;">skyblue</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">590</td>
+<td style="text-align: left;">skyblue1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">591</td>
+<td style="text-align: left;">skyblue2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">592</td>
+<td style="text-align: left;">skyblue3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">593</td>
+<td style="text-align: left;">skyblue4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">594</td>
+<td style="text-align: left;">slateblue</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">595</td>
+<td style="text-align: left;">slateblue1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">596</td>
+<td style="text-align: left;">slateblue2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">597</td>
+<td style="text-align: left;">slateblue3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">598</td>
+<td style="text-align: left;">slateblue4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">599</td>
+<td style="text-align: left;">slategray</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">600</td>
+<td style="text-align: left;">slategray1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">601</td>
+<td style="text-align: left;">slategray2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">602</td>
+<td style="text-align: left;">slategray3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">603</td>
+<td style="text-align: left;">slategray4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">604</td>
+<td style="text-align: left;">slategrey</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">605</td>
+<td style="text-align: left;">snow</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">606</td>
+<td style="text-align: left;">snow1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">607</td>
+<td style="text-align: left;">snow2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">608</td>
+<td style="text-align: left;">snow3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">609</td>
+<td style="text-align: left;">snow4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">610</td>
+<td style="text-align: left;">springgreen</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">611</td>
+<td style="text-align: left;">springgreen1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">612</td>
+<td style="text-align: left;">springgreen2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">613</td>
+<td style="text-align: left;">springgreen3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">614</td>
+<td style="text-align: left;">springgreen4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">615</td>
+<td style="text-align: left;">steelblue</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">616</td>
+<td style="text-align: left;">steelblue1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">617</td>
+<td style="text-align: left;">steelblue2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">618</td>
+<td style="text-align: left;">steelblue3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">619</td>
+<td style="text-align: left;">steelblue4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">620</td>
+<td style="text-align: left;">tan</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">621</td>
+<td style="text-align: left;">tan1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">622</td>
+<td style="text-align: left;">tan2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">623</td>
+<td style="text-align: left;">tan3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">624</td>
+<td style="text-align: left;">tan4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">625</td>
+<td style="text-align: left;">thistle</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">626</td>
+<td style="text-align: left;">thistle1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">627</td>
+<td style="text-align: left;">thistle2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">628</td>
+<td style="text-align: left;">thistle3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">629</td>
+<td style="text-align: left;">thistle4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">630</td>
+<td style="text-align: left;">tomato</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">631</td>
+<td style="text-align: left;">tomato1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">632</td>
+<td style="text-align: left;">tomato2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">633</td>
+<td style="text-align: left;">tomato3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">634</td>
+<td style="text-align: left;">tomato4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">635</td>
+<td style="text-align: left;">turquoise</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">636</td>
+<td style="text-align: left;">turquoise1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">637</td>
+<td style="text-align: left;">turquoise2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">638</td>
+<td style="text-align: left;">turquoise3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">639</td>
+<td style="text-align: left;">turquoise4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">640</td>
+<td style="text-align: left;">violet</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">641</td>
+<td style="text-align: left;">violetred</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">642</td>
+<td style="text-align: left;">violetred1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">643</td>
+<td style="text-align: left;">violetred2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">644</td>
+<td style="text-align: left;">violetred3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">645</td>
+<td style="text-align: left;">violetred4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">646</td>
+<td style="text-align: left;">wheat</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">647</td>
+<td style="text-align: left;">wheat1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">648</td>
+<td style="text-align: left;">wheat2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">649</td>
+<td style="text-align: left;">wheat3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">650</td>
+<td style="text-align: left;">wheat4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">651</td>
+<td style="text-align: left;">whitesmoke</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">652</td>
+<td style="text-align: left;">yellow</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">653</td>
+<td style="text-align: left;">yellow1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">654</td>
+<td style="text-align: left;">yellow2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">655</td>
+<td style="text-align: left;">yellow3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">656</td>
+<td style="text-align: left;">yellow4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">657</td>
+<td style="text-align: left;">yellowgreen</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</div>
+</div></li>
+<li><p>Manejar colores por nombres nos permite recordarlos fácilmente, pero es bastante limitado, a pesar de los más de 600 colores de la lista anterior, no es nada comparado con los más de 16 millones de colores que podemos generar con sistemas como RGB o HEX (aunque tampoco necesitamos tantos colores, ni todas las pantallas pueden generarlos)</p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-2_659c0f1505dccd2885d975f9282944e3">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>col.random <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">colors</span>(), <span class="at">size =</span> n)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span>n, <span class="at">y =</span> <span class="dv">1</span><span class="sc">:</span>n, <span class="at">col =</span> col.random, <span class="at">main =</span> <span class="st">"Algunos colores aleatorios"</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab=</span><span class="st">""</span>, <span class="at">pch =</span> <span class="dv">20</span>, <span class="at">cex =</span> <span class="dv">5</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>col.random</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "lightsalmon2" "darksalmon"   "lightpink"    "skyblue"      "grey14"      
+ [6] "floralwhite"  "springgreen"  "maroon3"      "grey23"       "ghostwhite"  
+[11] "gray42"       "grey72"       "powderblue"   "seashell"     "mistyrose1"  
+[16] "dimgray"      "grey40"       "mediumpurple" "springgreen2" "gainsboro"   </code></pre>
+</div>
+</div></li>
+</ul>
+<!-- legend("topright", inset=c(-0.29, 0), legend=col.random, pch=20, -->
+<!--        title="Colores", col=col.random) -->
+</section>
+<section id="sistema-rgb-y-hexadecimal" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="sistema-rgb-y-hexadecimal"><span class="header-section-number">2.4</span> Sistema RGB y Hexadecimal</h2>
+<section id="rgb" class="level3" data-number="2.4.1">
+<h3 data-number="2.4.1" class="anchored" data-anchor-id="rgb"><span class="header-section-number">2.4.1</span> RGB</h3>
+<ul>
+<li><p>Iniciales de los colores primarios (en inglés): R: Red; G: Green; B: Blue. Se basa en la combinación de diferentes niveles de intensidad para cada uno de estos colores</p></li>
+<li><p>Se representa como una terna, donde cada valor está entre 0 y 255 (también en escala de 0 a 1 o en porcentajes de 0 a 100). Equivalencia de los colores primarios:</p>
+<ul>
+<li>Rojo: rgb(255, 0, 0)</li>
+<li>Verde: rgb(0, 255, 0)</li>
+<li>Azul: rgb(0, 0, 255)</li>
+</ul></li>
+<li><p>Algunos colores en sistema RGB</p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-3_9ba5db662bf8704fa2ccda554e36866a">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">3</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="fu">rgb</span>(<span class="dv">230</span>,<span class="dv">50</span>,<span class="dv">110</span>, <span class="at">maxColorValue =</span> <span class="dv">255</span>), </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">rgb</span>(<span class="dv">20</span>,<span class="dv">50</span>,<span class="dv">10</span>, <span class="at">maxColorValue =</span> <span class="dv">100</span>),   </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">rgb</span>(<span class="fl">0.5</span>,<span class="fl">0.5</span>,<span class="fl">0.7</span>)), </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Algunos colores con RGB"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab=</span><span class="st">""</span>, <span class="at">pch =</span> <span class="dv">20</span>, <span class="at">cex =</span> <span class="dv">10</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div></li>
+<li><p>Por defecto, la función <code>rgb()</code> en <code>R</code>, tomará como valor máximo de la escala el 1, así que si se está trabajando en la escala 0-255 (lo más usual), es necesario establecer <code>maxColorValue=255</code></p></li>
+</ul>
+<!-- ```{r} -->
+<!-- plot.new() -->
+<!-- polygon() -->
+<!-- ``` -->
+<ul>
+<li><p>los 256 posibles valores para cada componente, pueden producir en total <span class="math inline">\(256^3=16777216\)</span>, más de 16 millones de colores!</p></li>
+<li><p>Es posible agregar un valor <span class="math inline">\(\alpha\)</span> de <em>opacidad</em> a los colores</p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-4_8bc354a6d1df78bde2ae797864f0eaba">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>alfa <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">5</span>, <span class="dv">255</span>, <span class="at">by =</span> <span class="dv">25</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">1</span>,<span class="fu">length</span>(alfa)), <span class="at">col =</span> <span class="fu">rgb</span>(<span class="dv">17</span>, <span class="dv">125</span>, <span class="dv">0</span>, <span class="at">maxColorValue =</span> <span class="dv">255</span>, <span class="at">alpha =</span> alfa), </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">cex =</span> <span class="dv">10</span>, <span class="at">pch =</span> <span class="dv">20</span>, <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Agregar opacidad al color"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div></li>
+</ul>
+</section>
+<section id="hexadecimal" class="level3" data-number="2.4.2">
+<h3 data-number="2.4.2" class="anchored" data-anchor-id="hexadecimal"><span class="header-section-number">2.4.2</span> Hexadecimal</h3>
+<ul>
+<li><p>El sistema hexadecimal consta de 6 posiciones 👨‍🏫, las primeras 2 para el rojo, las siguientes para el verde y las últimas para el azul. Cada una de estas varía entre 00 y FF. Equivalencia de los colores primarios:</p>
+<ul>
+<li>Rojo: #FF0000</li>
+<li>Verde: #00FF00</li>
+<li>Azul: #0000FF</li>
+</ul></li>
+<li><p>Hay una correspondencia uno a uno entre ambos sistemas (RGB y HEX). Al igual que el sistema RGB, se puede agregar una propiedad de opacidad al agregar 2 posiciones más (también entre 00 y FF) al sistema Hexadecimal.</p></li>
+<li><p>Algunos colores en sistema Hexadecimal</p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-5_95cb270ec1e246bef03c937d6addf2be">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">7</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#AD504E"</span>, <span class="st">"#5F9EA0"</span>, <span class="st">"#009ACD"</span>, <span class="st">"#435EBF"</span>, </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                           <span class="st">"#2F5A63"</span>, <span class="st">"#2F5A63A6"</span>, <span class="st">"#2F5A6355"</span>),</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">cex =</span> <span class="dv">10</span>, <span class="at">pch =</span> <span class="dv">20</span>, <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Algunos colores con Hexadecimal"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div></li>
+<li><p>La equivalencia de los colores primarios en los sistemas RGB y Hex, se resume en la imagen</p></li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/color.png" class="img-fluid figure-img" style="width:70.0%"></p>
+<figcaption class="figure-caption">Tomado de <a href="https://www.w3schools.com/colors/default.asp" class="uri">https://www.w3schools.com/colors/default.asp</a></figcaption>
+</figure>
+</div>
+<ul>
+<li><p>La función <code>rgb()</code> convierte el código RGB a Hexadecimal. También se puede hacer lo contrario con la función <code>col2rgb()</code></p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-6_c567234d4c8322723fa640ddb710b8fc">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rgb</span>(<span class="dv">255</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="at">maxColorValue =</span> <span class="dv">255</span>) <span class="co"># De RGB a Hexadecimal</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "#FF0000"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">col2rgb</span>(<span class="st">"#FF0000"</span>) <span class="co"># De Hexadecimal a RGB</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      [,1]
+red    255
+green    0
+blue     0</code></pre>
+</div>
+</div></li>
+<li><p>Dado que estamos hablando de colores, sin duda alguna lo más natural y sencillo es verlos en lugar de memorizar códigos. Hay muchas herramientas <em>online</em> que sirven como mezcladores de colores y nos devuelven los respectivos códigos en diferentes sistemas. El tutorial en <strong>w3schools</strong> es bastante bueno</p></li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://www.w3schools.com/colors/colors_picker.asp" target="_blank"><img src="images/colpickerw3.png" title="Clic para ir al sitio" class="img-fluid figure-img" style="width:70.0%"></a></p>
+</figure>
+</div>
+<ul>
+<li><p>En Rstudio podemos instalar el complemento <code>colourPicker</code> con <code>install.packages("colourpicker")</code>. Al hacerlo se activa en el botón <em>Addins</em> un nuevo complemento.</p>
+<p><img src="images/rstudio-pick1.png" class="img-fluid" style="width:45.0%"> <img src="images/rstudio-pick2.png" class="img-fluid" style="width:45.0%"></p></li>
+<li><p>si desea aprender un poco más sobre este tema tan interesante (opcional), puede visitar el <a href="https://www.w3schools.com/colors/default.asp" target="_blank">tutorial de w3schools</a></p></li>
+</ul>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-7_ec586f2729e81034b9a6a4f9148c8ecd">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="at">x =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">255</span>, <span class="at">size =</span> n)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="at">x =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">255</span>, <span class="at">size =</span> n)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="at">x =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">255</span>, <span class="at">size =</span> n)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>tab.col <span class="ot">&lt;-</span> <span class="fu">cbind</span>(x,y,z)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">rep</span>(<span class="dv">1</span>,n), <span class="at">col =</span> <span class="fu">rgb</span>(tab.col, <span class="at">maxColorValue =</span> <span class="dv">255</span>), <span class="at">pch =</span> <span class="dv">20</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">cex =</span> <span class="dv">8</span>, <span class="at">main =</span> <span class="st">"Otro conjunto de colores aleatorios"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="center-table">
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-8_a7fd3f49a392122e45879b3aec37145f">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small" data-quarto-postprocess="true" data-tbl-colwidths="true">
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">x</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">y</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">z</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">146</td>
+<td style="text-align: right;">210</td>
+<td style="text-align: right;">28</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">143</td>
+<td style="text-align: right;">199</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">187</td>
+<td style="text-align: right;">109</td>
+<td style="text-align: right;">239</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">95</td>
+<td style="text-align: right;">115</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">78</td>
+<td style="text-align: right;">191</td>
+<td style="text-align: right;">149</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">223</td>
+<td style="text-align: right;">84</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">159</td>
+<td style="text-align: right;">89</td>
+<td style="text-align: right;">133</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">89</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">191</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">87</td>
+<td style="text-align: right;">196</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">246</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">129</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="importar-los-datos" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="importar-los-datos"><span class="header-section-number">2.5</span> Importar los datos</h2>
+<p>Podemos cargar los datos desde archivos externos. En este caso, tenemos dos archivos de texto que contienen la información de los vértices y aristas de la red que vamos a trabajar como ejemplo. Descargue desde Moodle los archivos: <code>artistas.txt</code> y <code>vertices.txt</code>, y guárdelos en la misma carpeta en donde tiene el script de <code>R</code>. Verifique que el directorio de trabajo de su sesión actual de <code>R</code> sea la carpeta donde se encuentran los archivos de texto, use <code>getwd()</code>.</p>
+<p>ejecute el siguiente código para cargar los datos en <code>R</code></p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-9_988ca56ce4432d19bc922afed9b8e7ee">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>aristas <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="at">file =</span> <span class="st">"aristas.txt"</span>, <span class="at">header =</span> T)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>vertices <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="at">file =</span> <span class="st">"vertices.txt"</span>, <span class="at">header =</span> T)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Observe la información en las primeras filas de cada una de estas bases de datos</p>
+<div class="center-table">
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-10_6d5a03e57576f4e2cb1844a779489371">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(aristas)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(vertices)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div class="center-table">
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-11_1f1635f2de74db4e33d6a90df8478c82">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">inicio</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">fin</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">distancia</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">tipo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: left;">tipo5</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">103</td>
+<td style="text-align: left;">tipo1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: left;">tipo4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: left;">tipo1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: left;">tipo3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: left;">tipo4</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">vertice</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">demanda</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">grupo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: left;">grupo1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: left;">grupo2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: left;">grupo4</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: left;">grupo4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: left;">grupo3</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: left;">grupo4</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</section>
+<section id="crear-la-red" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="crear-la-red"><span class="header-section-number">2.6</span> Crear la red</h2>
+<p>Al crear la red en <code>R</code> (con <code>igraph</code>) se crea un objeto que guarda toda la información necesaria para hacer gráficas y cálculos. Hay varias funciones que pueden usarse para crear estos objetos, antes hemos usado la función <code>graph(edges=edges_list)</code> para crear la red a partir de un vector que contiene las aristas como pares de nodos. En este caso, construiremos la red a partir de un <code>data frame</code> con la función <code>graph_from_data_frame()</code>. Esta función requiere un <code>data frame</code> como primer argumento, y las primeras dos columnas deben corresponder a los puntos iniciales y finales de cada arista, respectivamente</p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-12_0443c7006b29b7ea34a8010111dcfe11">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>red1 <span class="ot">&lt;-</span> <span class="fu">graph_from_data_frame</span>(<span class="at">d =</span> aristas, <span class="at">vertices =</span> vertices, <span class="at">directed =</span> T)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>red2 <span class="ot">&lt;-</span> <span class="fu">graph_from_data_frame</span>(<span class="at">d =</span> aristas, <span class="at">vertices =</span> vertices, <span class="at">directed =</span> F)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Podemos imprimir la información en cada uno de estos objetos</p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-13_efe5c5875b9f6038f4e781ffd1ff234e">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>red1</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>IGRAPH 75350c7 DN-- 20 60 -- 
++ attr: name (v/c), demanda (v/n), grupo (v/c), distancia (e/n), tipo
+| (e/c)
++ edges from 75350c7 (vertex names):
+ [1] 1 -&gt;4  2 -&gt;4  2 -&gt;5  4 -&gt;5  3 -&gt;6  1 -&gt;8  3 -&gt;8  1 -&gt;9  4 -&gt;9  5 -&gt;9 
+[11] 8 -&gt;9  4 -&gt;10 3 -&gt;11 7 -&gt;11 10-&gt;11 5 -&gt;12 7 -&gt;12 8 -&gt;12 9 -&gt;12 1 -&gt;13
+[21] 6 -&gt;13 7 -&gt;13 8 -&gt;13 10-&gt;13 11-&gt;13 3 -&gt;14 4 -&gt;14 7 -&gt;14 7 -&gt;15 9 -&gt;15
+[31] 13-&gt;15 1 -&gt;16 7 -&gt;16 11-&gt;16 13-&gt;16 14-&gt;16 1 -&gt;17 4 -&gt;17 6 -&gt;17 7 -&gt;17
+[41] 8 -&gt;17 10-&gt;17 1 -&gt;18 6 -&gt;18 15-&gt;18 16-&gt;18 2 -&gt;19 5 -&gt;19 6 -&gt;19 8 -&gt;19
+[51] 1 -&gt;20 3 -&gt;20 5 -&gt;20 7 -&gt;20 8 -&gt;20 9 -&gt;20 12-&gt;20 15-&gt;20 17-&gt;20 18-&gt;20</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>red2</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>IGRAPH 7535ded UN-- 20 60 -- 
++ attr: name (v/c), demanda (v/n), grupo (v/c), distancia (e/n), tipo
+| (e/c)
++ edges from 7535ded (vertex names):
+ [1] 1 --4  2 --4  2 --5  4 --5  3 --6  1 --8  3 --8  1 --9  4 --9  5 --9 
+[11] 8 --9  4 --10 3 --11 7 --11 10--11 5 --12 7 --12 8 --12 9 --12 1 --13
+[21] 6 --13 7 --13 8 --13 10--13 11--13 3 --14 4 --14 7 --14 7 --15 9 --15
+[31] 13--15 1 --16 7 --16 11--16 13--16 14--16 1 --17 4 --17 6 --17 7 --17
+[41] 8 --17 10--17 1 --18 6 --18 15--18 16--18 2 --19 5 --19 6 --19 8 --19
+[51] 1 --20 3 --20 5 --20 7 --20 8 --20 9 --20 12--20 15--20 17--20 18--20</code></pre>
+</div>
+</div>
+<p>Con las funciones <code>E()</code> y <code>V()</code> podemos acceder de manera independiente a las aristas y vértices de cada red. Podemos incluso, agregar nuevos atributos. Por ejemplo</p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-14_b11c18e3878aace791bf961cae66f438">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(red1)<span class="sc">$</span>otro_atributo <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="at">n =</span> <span class="fu">length</span>(<span class="fu">V</span>(red1)))</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>red1</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>IGRAPH 75350c7 DN-- 20 60 -- 
++ attr: name (v/c), demanda (v/n), grupo (v/c), otro_atributo (v/n),
+| distancia (e/n), tipo (e/c)
++ edges from 75350c7 (vertex names):
+ [1] 1 -&gt;4  2 -&gt;4  2 -&gt;5  4 -&gt;5  3 -&gt;6  1 -&gt;8  3 -&gt;8  1 -&gt;9  4 -&gt;9  5 -&gt;9 
+[11] 8 -&gt;9  4 -&gt;10 3 -&gt;11 7 -&gt;11 10-&gt;11 5 -&gt;12 7 -&gt;12 8 -&gt;12 9 -&gt;12 1 -&gt;13
+[21] 6 -&gt;13 7 -&gt;13 8 -&gt;13 10-&gt;13 11-&gt;13 3 -&gt;14 4 -&gt;14 7 -&gt;14 7 -&gt;15 9 -&gt;15
+[31] 13-&gt;15 1 -&gt;16 7 -&gt;16 11-&gt;16 13-&gt;16 14-&gt;16 1 -&gt;17 4 -&gt;17 6 -&gt;17 7 -&gt;17
+[41] 8 -&gt;17 10-&gt;17 1 -&gt;18 6 -&gt;18 15-&gt;18 16-&gt;18 2 -&gt;19 5 -&gt;19 6 -&gt;19 8 -&gt;19
+[51] 1 -&gt;20 3 -&gt;20 5 -&gt;20 7 -&gt;20 8 -&gt;20 9 -&gt;20 12-&gt;20 15-&gt;20 17-&gt;20 18-&gt;20</code></pre>
+</div>
+</div>
+<p>Podemos, a partir del objeto de red, extraer varias estructuras de datos tales como:</p>
+<ul>
+<li>Lista de aristas</li>
+<li>Matriz de adyacencia</li>
+<li><em>Data Frame</em></li>
+</ul>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-15_b1019b26bd35b9d0ab82ebd6e641eb89">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_edgelist</span>(red2)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      [,1] [,2]
+ [1,] "1"  "4" 
+ [2,] "2"  "4" 
+ [3,] "2"  "5" 
+ [4,] "4"  "5" 
+ [5,] "3"  "6" 
+ [6,] "1"  "8" 
+ [7,] "3"  "8" 
+ [8,] "1"  "9" 
+ [9,] "4"  "9" 
+[10,] "5"  "9" 
+[11,] "8"  "9" 
+[12,] "4"  "10"
+[13,] "3"  "11"
+[14,] "7"  "11"
+[15,] "10" "11"
+[16,] "5"  "12"
+[17,] "7"  "12"
+[18,] "8"  "12"
+[19,] "9"  "12"
+[20,] "1"  "13"
+[21,] "6"  "13"
+[22,] "7"  "13"
+[23,] "8"  "13"
+[24,] "10" "13"
+[25,] "11" "13"
+[26,] "3"  "14"
+[27,] "4"  "14"
+[28,] "7"  "14"
+[29,] "7"  "15"
+[30,] "9"  "15"
+[31,] "13" "15"
+[32,] "1"  "16"
+[33,] "7"  "16"
+[34,] "11" "16"
+[35,] "13" "16"
+[36,] "14" "16"
+[37,] "1"  "17"
+[38,] "4"  "17"
+[39,] "6"  "17"
+[40,] "7"  "17"
+[41,] "8"  "17"
+[42,] "10" "17"
+[43,] "1"  "18"
+[44,] "6"  "18"
+[45,] "15" "18"
+[46,] "16" "18"
+[47,] "2"  "19"
+[48,] "5"  "19"
+[49,] "6"  "19"
+[50,] "8"  "19"
+[51,] "1"  "20"
+[52,] "3"  "20"
+[53,] "5"  "20"
+[54,] "7"  "20"
+[55,] "8"  "20"
+[56,] "9"  "20"
+[57,] "12" "20"
+[58,] "15" "20"
+[59,] "17" "20"
+[60,] "18" "20"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_adjacency_matrix</span>(red2)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>20 x 20 sparse Matrix of class "dgCMatrix"
+                                          
+1  . . . 1 . . . 1 1 . . . 1 . . 1 1 1 . 1
+2  . . . 1 1 . . . . . . . . . . . . . 1 .
+3  . . . . . 1 . 1 . . 1 . . 1 . . . . . 1
+4  1 1 . . 1 . . . 1 1 . . . 1 . . 1 . . .
+5  . 1 . 1 . . . . 1 . . 1 . . . . . . 1 1
+6  . . 1 . . . . . . . . . 1 . . . 1 1 1 .
+7  . . . . . . . . . . 1 1 1 1 1 1 1 . . 1
+8  1 . 1 . . . . . 1 . . 1 1 . . . 1 . 1 1
+9  1 . . 1 1 . . 1 . . . 1 . . 1 . . . . 1
+10 . . . 1 . . . . . . 1 . 1 . . . 1 . . .
+11 . . 1 . . . 1 . . 1 . . 1 . . 1 . . . .
+12 . . . . 1 . 1 1 1 . . . . . . . . . . 1
+13 1 . . . . 1 1 1 . 1 1 . . . 1 1 . . . .
+14 . . 1 1 . . 1 . . . . . . . . 1 . . . .
+15 . . . . . . 1 . 1 . . . 1 . . . . 1 . 1
+16 1 . . . . . 1 . . . 1 . 1 1 . . . 1 . .
+17 1 . . 1 . 1 1 1 . 1 . . . . . . . . . 1
+18 1 . . . . 1 . . . . . . . . 1 1 . . . 1
+19 . 1 . . 1 1 . 1 . . . . . . . . . . . .
+20 1 . 1 . 1 . 1 1 1 . . 1 . . 1 . 1 1 . .</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as_data_frame</span>(red2, <span class="at">what =</span> <span class="st">"edges"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   from to distancia  tipo
+1     1  4         5 tipo5
+2     2  4       103 tipo1
+3     2  5        86 tipo4
+4     4  5        13 tipo1
+5     3  6        43 tipo3
+6     1  8        33 tipo4
+7     3  8        45 tipo1
+8     1  9        67 tipo2
+9     4  9        74 tipo2
+10    5  9        66 tipo4
+11    8  9        67 tipo4
+12    4 10        77 tipo4
+13    3 11        31 tipo1
+14    7 11        60 tipo4
+15   10 11        55 tipo1
+16    5 12        27 tipo4
+17    7 12        35 tipo4
+18    8 12        87 tipo1
+19    9 12        59 tipo2
+20    1 13        41 tipo2
+21    6 13        95 tipo1
+22    7 13        75 tipo4
+23    8 13        75 tipo5
+24   10 13        50 tipo3
+25   11 13        70 tipo5
+26    3 14        67 tipo4
+27    4 14        65 tipo2
+28    7 14        71 tipo1
+29    7 15        80 tipo1
+30    9 15        40 tipo2
+31   13 15        44 tipo2
+32    1 16        83 tipo5
+33    7 16        21 tipo4
+34   11 16        36 tipo3
+35   13 16        51 tipo1
+36   14 16        47 tipo5
+37    1 17        66 tipo4
+38    4 17        87 tipo4
+39    6 17        49 tipo1
+40    7 17        57 tipo3
+41    8 17        54 tipo1
+42   10 17        60 tipo4
+43    1 18        57 tipo2
+44    6 18        61 tipo4
+45   15 18        39 tipo3
+46   16 18        71 tipo3
+47    2 19        44 tipo1
+48    5 19        65 tipo5
+49    6 19        51 tipo4
+50    8 19        21 tipo1
+51    1 20        71 tipo4
+52    3 20        48 tipo1
+53    5 20        82 tipo4
+54    7 20        68 tipo1
+55    8 20        80 tipo5
+56    9 20        65 tipo4
+57   12 20        83 tipo2
+58   15 20        53 tipo2
+59   17 20        66 tipo2
+60   18 20        72 tipo2</code></pre>
+</div>
+</div>
+</section>
+<section id="graficar-la-red" class="level2" data-number="2.7">
+<h2 data-number="2.7" class="anchored" data-anchor-id="graficar-la-red"><span class="header-section-number">2.7</span> Graficar la red</h2>
+<p>Ya creados los objetos de redes, graficarlos es bastante simple y versátil. En el paquete <code>igraph</code> hay 3 funciones que pueden usarse para tal fin:</p>
+<ul>
+<li><code>plot.igraph()</code> Crea gráficas 2D no interactivas, puede simplemente usarse <code>plot</code></li>
+<li><code>tkplot()</code> Produce gráficos 2D interactivos</li>
+<li><code>rglplot()</code> Crea redes interactivas en 3D</li>
+</ul>
+<p>Empecemos usando la opción más común</p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-16_0ae3592b9cbf7ab61fc51b0d77138359">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.igraph</span>(red1)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(red2)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-16-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Fácil de graficar, pero el resultado es bastante mejorable (sobretodo para la red dirigida).</p>
+</section>
+<section id="parámetros-del-gráfico" class="level2" data-number="2.8">
+<h2 data-number="2.8" class="anchored" data-anchor-id="parámetros-del-gráfico"><span class="header-section-number">2.8</span> Parámetros del gráfico</h2>
+<p>Revisemos los parámetros que podemos modificar a la hora de graficar las redes. los parámetros correspondiente a los vértices se nombran como <code>vertex.nombre_atributo</code> y los correspondientes a las aristas como <code>edge.nombre_atributo</code>. Por ejemplo, <code>vertex.color</code> se refiere al color de los vértices y <code>edge.color</code> se refiere al color de las aristas 🤯</p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-17_bf487138a5f72236fcf3ad90426f687c">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(red1, <span class="at">vertex.color=</span><span class="st">"#D582E0B5"</span>, </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.shape =</span> <span class="st">"square"</span>, </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.size =</span> <span class="dv">30</span>, </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>     <span class="co"># vertex.size2 = 40, # para formas como "rectangle"</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.frame.color =</span> <span class="st">"#2E1D1D"</span>,</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">rescale =</span> T <span class="co"># este es el valor por defecto y es</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>                <span class="co"># buena idea dejarlo así</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>     )</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(red2, <span class="at">vertex.color=</span><span class="st">"#43A6F2C9"</span>, </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.shape =</span> <span class="st">"rectangle"</span>, </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.size =</span> <span class="dv">20</span>, </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.size2 =</span> <span class="dv">30</span>,</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.frame.color =</span> <span class="st">"#2E1D1D"</span>,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.frame.width =</span> <span class="dv">3</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>     </span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>     )</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-17-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Las opciones para <code>vertex.shape</code> son:</p>
+<ul>
+<li><code>none</code></li>
+<li><code>circle</code></li>
+<li><code>square</code></li>
+<li><code>csquare</code></li>
+<li><code>rectangle</code></li>
+<li><code>crectangle</code></li>
+<li><code>vrectangle</code></li>
+<li><code>pie</code></li>
+<li><code>raster</code></li>
+<li><code>sphere</code></li>
+</ul>
+<p>Otro intento 😥</p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-18_5d88e3462640129225301c1afbd61155">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(red1, <span class="at">vertex.color=</span><span class="st">"#D582E0B5"</span>, </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.shape =</span> <span class="st">"square"</span>, </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.size =</span> <span class="dv">10</span>, </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.label =</span> <span class="cn">NA</span>,</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.frame.color =</span> <span class="st">"#2E1D1D"</span>,</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>     </span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>     )</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(red2, <span class="at">vertex.color=</span><span class="st">"#43A6F2C9"</span>, </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.shape =</span> <span class="st">"rectangle"</span>, </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.size =</span> <span class="dv">10</span>, </span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.size2 =</span> <span class="dv">15</span>,</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.frame.color =</span> <span class="st">"#2E1D1D"</span>,</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.frame.width =</span> <span class="dv">3</span>,</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.label.font =</span> <span class="dv">2</span>, <span class="co"># 1: normal, 2: negrilla, 3; itálica</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>                            <span class="co"># 4: itálica y negrilla.</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.label.cex =</span> <span class="fl">0.5</span>,</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.label.color =</span> <span class="st">"red"</span>,</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.label.dist =</span> <span class="dv">2</span>, <span class="co">#distancia del centro</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.label.degree =</span> pi <span class="co">#0:derecha, pi:izquierda, pi/2 arriba, -pi/2: abajo</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>     )</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-18-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-19_32a737e9f98d315e0924a2e2252807f5">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(red1, <span class="at">vertex.color=</span><span class="st">"#D582E0B5"</span>, </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.shape =</span> <span class="st">"square"</span>, </span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.size =</span> <span class="dv">10</span>, </span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.label =</span> <span class="cn">NA</span>,</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.frame.color =</span> <span class="st">"#2E1D1D"</span>,</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>     </span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>     )</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(red2, <span class="at">vertex.color=</span><span class="st">"#43A6F2C9"</span>, </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.shape =</span> <span class="st">"rectangle"</span>, </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.size =</span> <span class="dv">10</span>, </span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.size2 =</span> <span class="dv">15</span>,</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.frame.color =</span> <span class="st">"#2E1D1D"</span>,</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.frame.width =</span> <span class="dv">3</span>,</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.label.font =</span> <span class="dv">2</span>, <span class="co"># 1: normal, 2: negrilla, 3; itálica</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>                            <span class="co"># 4: itálica y negrilla.</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.label.cex =</span> <span class="fl">0.5</span>,</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.label.color =</span> <span class="st">"red"</span>,</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.label.dist =</span> <span class="dv">2</span>, <span class="co">#distancia del centro</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.label.degree =</span> pi <span class="co">#0:derecha, pi:izquierda, pi/2 arriba, -pi/2: abajo</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>     )</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-19-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>¿Nada? ¡La tercera es la vencida! 💪. Resaltemos los vértices y aristas por demanda y distancia</p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-20_632ce1ba4ab89de2f27aaa5d9bd242c0">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(red1)<span class="sc">$</span>size <span class="ot">&lt;-</span> <span class="dv">20</span><span class="sc">*</span>(<span class="fu">V</span>(red1)<span class="sc">$</span>demanda<span class="sc">/</span><span class="fu">max</span>(<span class="fu">V</span>(red1)<span class="sc">$</span>demanda))</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(red1)<span class="sc">$</span>width <span class="ot">&lt;-</span> <span class="dv">5</span><span class="sc">*</span>(<span class="fu">E</span>(red1)<span class="sc">$</span>distancia<span class="sc">/</span><span class="fu">max</span>(<span class="fu">E</span>(red1)<span class="sc">$</span>distancia))</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(red1, <span class="at">vertex.color=</span><span class="st">"#D582E0B5"</span>, </span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.shape =</span> <span class="st">"square"</span>,</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.label =</span> <span class="cn">NA</span>,</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.frame.width =</span> <span class="fl">1.5</span>,</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.frame.color =</span> <span class="st">"#2E1D1D"</span>,</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">edge.color =</span> <span class="st">"#AEB4A9"</span>,</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">edge.arrow.size =</span> <span class="fl">0.8</span>,</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">edge.arrow.width =</span> <span class="fl">0.8</span>,</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>     </span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>     )</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Note que, la línea <code>V(red1)$size &lt;- 20*(V(red1)$demanda/max(V(red1)$demanda))</code> agrega un atributo <code>size</code> al conjunto de vértices de la red, de ahí la importancia de colocar el nombre preciso para que sea reconocido en la función <code>plot</code> sin necesidad de volver a declararlo. Es decir que si colocamos <code>V(red1)$size_1 &lt;- 20*(V(red1)$demanda/max(V(red1)$demanda))</code>, no funcionará ya que no hay un atributo para los vértices en la función <code>plot</code> llamado <code>size_1</code>. La misma aclaración aplica para el atributo de ancho de las aristas (<code>width</code>) en la línea <code>E(red1)$width &lt;- 5*(E(red1)$distancia/max(E(red1)$distancia))</code>.</p>
+<p>Ahora poniendo diferentes colores para cada grupo de nodos y tipo de arista</p>
+<div class="cell" data-hash="r-visual_cache/html/unnamed-chunk-21_6e6d32ad4bde97c531713272a9153175">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="fu">E</span>(red2)<span class="sc">$</span>tipo)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+tipo1 tipo2 tipo3 tipo4 tipo5 
+   16    12     6    19     7 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="fu">V</span>(red2)<span class="sc">$</span>grupo)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+grupo1 grupo2 grupo3 grupo4 
+     6      5      2      7 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(red2)<span class="sc">$</span>size <span class="ot">&lt;-</span> <span class="dv">20</span><span class="sc">*</span>(<span class="fu">V</span>(red2)<span class="sc">$</span>demanda<span class="sc">/</span><span class="fu">max</span>(<span class="fu">V</span>(red2)<span class="sc">$</span>demanda))</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(red2)<span class="sc">$</span>width <span class="ot">&lt;-</span> <span class="dv">5</span><span class="sc">*</span>(<span class="fu">E</span>(red2)<span class="sc">$</span>distancia<span class="sc">/</span><span class="fu">max</span>(<span class="fu">E</span>(red2)<span class="sc">$</span>distancia))</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>vert_color <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#E66563"</span>, <span class="st">"#357FBF"</span>, <span class="st">"#9AAD1F"</span>, <span class="st">"#237A28"</span>)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>edge_color <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#CD3278"</span>, <span class="st">"#EE3B3B"</span>, <span class="st">"#CD6839"</span>, <span class="st">"#B452CD"</span>, <span class="st">"#4169E1"</span>)</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(red2)<span class="sc">$</span>color <span class="ot">&lt;-</span> vert_color[<span class="fu">as.factor</span>(<span class="fu">V</span>(red2)<span class="sc">$</span>grupo)]</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(red2)<span class="sc">$</span>color <span class="ot">&lt;-</span> edge_color[<span class="fu">as.factor</span>(<span class="fu">E</span>(red2)<span class="sc">$</span>tipo)]</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(red2, <span class="at">vertex.color=</span>vert_color, </span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.shape =</span> <span class="st">"square"</span>, </span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.label =</span> <span class="cn">NA</span>,</span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.frame.width =</span> <span class="fl">1.5</span>,</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.frame.color =</span> <span class="st">"#2E1D1D"</span>,</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>     )</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="r-visual_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-Ahuja1995" class="csl-entry" role="listitem">
+Ahuja, Ravindra K, Thomas L Magnanti, y James B Orlin. 1995. <em>Network Flows: Theory, Algorithms and Applications</em>. Prentice Hall.
+</div>
+<div id="ref-Bazaraa2011" class="csl-entry" role="listitem">
+Bazaraa, Mokhtar S., John J. Jarvis, y Hanif D. Sherali. 2011. <em>Linear Programming and Network Flows</em>. Wiley-Interscience.
+</div>
+<div id="ref-Chen1990" class="csl-entry" role="listitem">
+Chen, Wai-Kai. 1990. <span>«Theory of Nets: Flows in Networks»</span>.
+</div>
+<div id="ref-Chen2019" class="csl-entry" role="listitem">
+Chen, Yunran. 2019. <span>«Introduction to Network Analysis Using R»</span>. <a href="https://yunranchen.github.io/intro-net-r/index.html">https://yunranchen.github.io/intro-net-r/index.html</a>.
+</div>
+<div id="ref-Deo2017" class="csl-entry" role="listitem">
+Deo, Narsingh. 2017. <em>Graph Theory with Applications to Engineering and Computer Science</em>. Courier Dover Publications.
+</div>
+<div id="ref-Evans1992" class="csl-entry" role="listitem">
+Evans, James R, y Edward Minieka. 1992. <em>Optimization Algorithms for Networks and Graphs</em>. CRC Press.
+</div>
+<div id="ref-Rao2009" class="csl-entry" role="listitem">
+Rao, Singiresu S. 2009. <em>Engineering Optimization: Theory and Practice: Fourth Edition</em>. <em>Engineering Optimization: Theory and Practice: Fourth Edition</em>.
+</div>
+<div id="ref-Ray2013" class="csl-entry" role="listitem">
+Ray, Santanu Saha. 2013. <em>Graph Theory with Algorithms and its Applications: in Applied Science and Technology</em>. Springer.
+</div>
+<div id="ref-Gerard2010" class="csl-entry" role="listitem">
+Sierksma, Gerard, y Diptesh Ghosh. 2010. <em>Networks in Action: Text and Computer Exercises in Network Optimization</em>. Springer.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copiado");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copiado");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./r-intro.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introducción al uso de <code>R</code></span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./references.html" class="pagination-link">
+        <span class="nav-page-text">Referencias</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

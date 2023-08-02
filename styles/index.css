@@ -1,0 +1,14 @@
+h1{color: #29849a;}
+h2{color: #9a2984;}
+
+#title-block-header{
+  color: #849a29;
+  background-image: url("upb-logo.png");
+  background-repeat: no-repeat;
+  background-position: right;
+  background-size: 200px;
+}
+main{
+  text-align: justify;
+}
+figcaption{text-align: center}
