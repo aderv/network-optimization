@@ -141,7 +141,7 @@ div.csl-indent {
 <link rel="stylesheet" href="styles/global.css">
 </head>
 
-<body class="nav-sidebar floating">
+<body class="nav-sidebar floating slimcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -190,7 +190,13 @@ div.csl-indent {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./r-visual.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Construcción y visualización en <code>R</code></span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Construcción y visualización de redes con <code>igraph</code></span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./stp-intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Problema de ruta más corta</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -231,7 +237,7 @@ div.csl-indent {
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content page-columns page-full" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -269,7 +275,7 @@ div.csl-indent {
 </div>
 <p>Guarde su trabajo desde el menú: <code>File -&gt; Save As</code>; o con: <code>ctrl+S</code>.</p>
 </section>
-<section id="lo-básico" class="level2" data-number="1.2">
+<section id="lo-básico" class="level2 page-columns page-full" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="lo-básico"><span class="header-section-number">1.2</span> Lo básico</h2>
 <ul>
 <li><p><code>R</code> es un <a href="https://en.wikipedia.org/wiki/Type_system#DYNAMIC" target="_blank">lenguaje de tipado dinámico y de alto nivel</a> (o sea, fácil de aprender)</p></li>
@@ -280,7 +286,7 @@ div.csl-indent {
 <li><p>Los nombres de las variables deben empezar con una letra<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> y luego cualquier carácter alfanumérico. Los únicos caracteres especiales permitidos son el punto (.) y el guión bajo (_), útiles cuando se quiere usar nombres compuestos</p></li>
 <li><p>Los nombres de variables no deben contener espacios</p></li>
 </ul>
-<p>Ejemplos de asignación de valores a variables:</p>
+<div class="no-row-height column-margin column-container"><li id="fn1"><p><sup>1</sup>&nbsp;También pueden empezar con un <code>.</code> pero esto crea objetos ocultos</p></li></div><p>Ejemplos de asignación de valores a variables:</p>
 <div class="cell" data-hash="r-intro_cache/html/unnamed-chunk-1_69b2396e2aeb934ca5010184b02777e0">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>a1 <span class="ot">&lt;-</span> <span class="dv">56</span> <span class="co"># numeric</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>b <span class="ot">=</span> <span class="fl">12.3</span> <span class="co"># numeric</span></span>
@@ -761,7 +767,7 @@ suc2    2    3    4    5    6    7    8    9   10</code></pre>
 <span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>()) <span class="co"># borra todo</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="funciones" class="level2" data-number="1.11">
+<section id="funciones" class="level2 page-columns page-full" data-number="1.11">
 <h2 data-number="1.11" class="anchored" data-anchor-id="funciones"><span class="header-section-number">1.11</span> Funciones</h2>
 <p><code>R</code> está optimizado para trabajar con funciones. Una función es un conjunto de líneas de código que se guardan en memoria y que se puede <em>llamar</em> siempre que sea necesario en otras partes del código, sin necesidad de volver a escribir todo lo que hace dicha función</p>
 <p>La sintaxis básica para crear una función en <code>R</code> es</p>
@@ -781,7 +787,7 @@ suc2    2    3    4    5    6    7    8    9   10</code></pre>
 <p><img src="r-intro_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Si las operaciones que hace la función se declaran en una sola línea, no es necesario usar las llaves <code>{}</code>. Si las declaraciones dentro de la función ocupan varias líneas, entonces sí es necesario usar las llaves<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<div class="page-columns page-full"><p>Si las operaciones que hace la función se declaran en una sola línea, no es necesario usar las llaves <code>{}</code>. Si las declaraciones dentro de la función ocupan varias líneas, entonces sí es necesario usar las llaves<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p><div class="no-row-height column-margin column-container"><li id="fn2"><p><sup>2</sup>&nbsp;Casi siempre es necesario, las funciones no suelen ser tan simples para declararse en una sola línea de código</p></li></div></div>
 <p>Funciones de 2 variables</p>
 <div class="cell" data-hash="r-intro_cache/html/unnamed-chunk-22_02ffdf1405eccc358cdfdcc6bbcb5642">
 <div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>funcion_2 <span class="ot">&lt;-</span> <span class="cf">function</span>(x,y){</span>
@@ -996,13 +1002,7 @@ Sierksma, Gerard, y Diptesh Ghosh. 2010. <em>Networks in Action: Text and Comput
 </div>
 </section>
 </section>
-<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
-<hr>
-<ol>
-<li id="fn1"><p>También pueden empezar con un <code>.</code> pero esto crea objetos ocultos<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>Casi siempre es necesario, las funciones no suelen ser tan simples para declararse en una sola línea de código<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-</ol>
-</section>
+
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -1246,7 +1246,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   </div>
   <div class="nav-page nav-page-next">
       <a href="./r-visual.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Construcción y visualización en <code>R</code></span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Construcción y visualización de redes con <code>igraph</code></span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
